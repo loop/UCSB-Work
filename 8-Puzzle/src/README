@@ -1,0 +1,66 @@
+Code architecture
+
+The code architecture of my program consists of 3 classes, the main class is called Puzzle, this class defines the board of the NxN puzzle, the goal state, checks if the input is even possible to solve and also initialises the heuristic in order for the program to start exploring nodes to chose the move it should make to reach the goal state.
+
+My code works in the basic way, insert the initial state into a priority queue. Then, delete from the priority queue the state with the minimum priority, and insert onto the priority queue all neighbouring state. I repeat this until the state dequeued is the goal state. And in order for me to do this I had to implement a priority function and that function was Manhattan Distance.
+
+To be more precise, I will now go over the methods and what each of these methods do for the classes I have implemented.
+For the Puzzle.java class, the methods that are implemented are:
+
+Puzzle() - Initialises the program and allocates memory for the data to puzzle data to be read into a 2-dimensional array.
+
+priority() - This method calculates the manhattan distance by calculating the difference of position from the current position to the next node on which the correct move should be made to.
+
+differenceOfPosition() - This calculates from where the current blank square is and the difference between moving it to another spot. Using this calculation the highest priority move will be chosen as the next move.
+
+compareTo() -	It compares which board position is closer to the goal board position using the distances calculated from the Manhattan Distance heuristic.
+
+getBoard() - It merely returns the number of squares that are on the board.
+
+puzzleSolved() - Boolean to return if puzzle has been solved or not.
+
+examineGoalState() - Checks if he goal state has been reached
+
+distance() - Returns sum of Manhattan distances of squares to their proper position
+
+getZeroXLocation() - Finds the location of the blank square (0) in the X axis.
+
+getZeroYLocation() - Finds the location of the blank square (0) in the Y axis.
+
+setZeroLocation() - Sets the X and Y location of the blank square (0).
+
+puzzleNeighbours() - It returns the neighbouring board positions.
+
+showSolution() - Returns the solution of the moves it took and at each point a graphical representation of the board.
+
+calculateSolveability() - Checks if the original input is even possible to solve. This was implemented by calculating the inversions of the board, inversion of the is when a tile precedes another tile with a lower number on it. This method was implemented from http://www.cs.bham.ac.uk/~mdr/teaching/modules04/java2/TilesSolvability.html.
+
+main() - This method reads the .txt file, runs the whole program and outputs the solution to a .txt output file.
+
+The second class is modified Priority Queue data structure, simply called PriorityQueue.java that implements Iterable. This data structure has a invariant which is that it maintains a minimum priory queue, to do this a heap is used so the minimum key is at the top.  This class includes all the basic methods such as insert(), delete(), size() but includes other custom methods:
+
+resize() - Doubles the array of size
+insert() - Inserts a new key into the queue and moves the key into a certain location on the heap so the invariant is kept.
+deleteMin() - Deletes the minimum key while returning it and the heap is fixed so the invariant is kept true.
+moveUp() - Moves a key up the heap. 
+moveDown() - Moves a key down the heap.
+isBigger() - Comparator to check if one key is bigger than another. Returns true or false.
+swap() - Swaps two keys from their respectable positions.
+
+The third and final class is called PuzzleIterator.java, the basic job of this class is to iterate over keys in the priority queue in increasing order. It implements all the basic methods such as remove(), hasNext().
+
+Heuristic design choice
+
+The search strategy I used is A* search with the heuristic of Manhattan Distance. The reason I chose Manhattan Distance is because it is the standard heuristic for A* on a grid system. By looking at my cost function and find the minimum cost C for moving from one square to an adjacent square. In the simple case, you can set C to be 1. The heuristic on a square grid where you can move in 4 directions should be C times the Manhattan distance and this is perfect for this kind of problem.
+The reasoning behind on how I chose the C is as follows; in order for my heuristic to admissible I followed the following method in calculating the distance. I set C to be the lowest of cost between squares next to each other, and if I move the empty square I increase the the total cost by 1, then I check if I move that empty square into that next position weather I will be nearer to my goal state.
+The sum of the distances from the squares to their goal positions, plus the number of moves made so far to get to the state is the basic method behind the heuristic.
+
+Challenges faced and how I solved them
+
+The challenges I faced while implementing this solution was that at the start all the puzzles would be completed in a way that it used many more moves than it was needed. It would for example complete a puzzle in 25 moves when it would be done in 17 moves. The problem was that there was a miscalculation in my manhattan distance heuristic, I was traversing the queue in a way such that it would not chose the queue element with the highest priory and because it chose the lowest priory move, it would take more moves to complete it.
+
+Other problems I ran into was that when searching for the highest priory move, the code would go out of bounds and check squares that weren’t neighbours, I had to implement a fix where it would just continue and skip that iteration.
+
+Weaknesses in your methods
+
+The weakness in my method is that it will not solve any NxN puzzles that are greater than 3x3 and due to this reason it is a very limited solution. It will also for some reason the code will hang, and I have yet to find a solution for this, the problem seems to do with some inputs (but if I run the same input again it will sometimes run fine and find a solution). This is the main bug that I can’t seem to find a solution for. 

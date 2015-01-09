@@ -1,0 +1,49 @@
+Code Architecture
+
+The code architecture of my program consists of 4 classes, the main class is called MP2, this class simply reads the training.txt and testing.txt file and executes the methods of passing in these files to train the filter and tests the testing.txt file. The other 3 classes are explained in more detail below.
+
+My code works in a basic way, read the 2 files, analyse and learn what is spam and what is ham using the training.txt file, strip the files from any useless data such as line breaks, calculate the spam and ham probability of each word. I will explain the calculations I used later in this README. Then the testing.txt file is used and the messages from that are split into an array. The messages are then read through one by and one, calculating the spam rating and if it is over a certain number, it will be marked as spam, else it will be assumed to be ham.
+
+To be more precise, I will now go over the method and what each of these methods do for the classes that I have implemented.
+
+For the main class MP2.java, there is only the main() method, and what this does has already been explained above.
+
+The second class is TextFileReader.java. Instead of duplicating code when reading in the 2 files, I decided to create dedicated class that can read the files and save the content. This means that less code needs to be written and can be easily reused. The methods of this class and what they do is the following:
+
+TextFileReader() - Sets up the object by passing through the .txt file name and executes the readTextContent() method.
+getTextContent() - Returns the content of the .txt file.
+readTextContent() - Open the .txt file, reads the .txt and closes it when it is done. The content is saved to a string variable.
+
+The third class is called Word.java, this class describes each word and the different probabilities that are linked with that word such as the total number of times the word appears in a spam message, total number of times it appears in a ham message, the bad count, good count and the probability that this word is spam. The methods of this class are the following:
+
+Word() - Creates a Word object and initialises all the calculations to 0.
+badProbabilityCalculation() - Calclautes how often a bad word appears by computing countBad()/total number of words
+countBad() - Incrementer to keep track of bad words.
+countGood() - Incrementer to keep track of good words.
+goodProbabilityCalculation() - Calculates how often a good word appears by computing countGood()/total number of words.
+finalProbabilityCalculations() - Computes probability using Bayes rules, this computation gives us how likely it is to be a spam word. 
+interestingWords() - This method stores the value the rating of what a interesting word should be, and calculates how different is it from the rating.
+getGoodProbability() - Getter to get the good word probability rating.
+getBadProbability() - Getter to get the bad word probability rating.
+getSpamProbability() - Getter to get the spam probability rating.
+setSpamProbability() - Setter to set the spam probability rating after calculating it.
+getWord() - Getter to return the current word that is being analysed.
+
+The fourth and final class is what I consider to be the heart of the program, this is where everything comes together. This is class is called the MessageFilter.java. This filter is implemented using a HashMap of Word objects. It consists of the following methods:
+
+MessageFilter() - Initialises the variables and the message fields.
+cleanUpTraining() - This method goes through each word and calculates the spam probability.
+showMessageStatistics() - This method displays the words that are stores in the hash map and the spam probability of that word.
+spamAnalyser() - This method is implemented using Paul Graham’s spam post - http://www.paulgraham.com/spam.html.
+It works by creating an array of 15 most interesting words, in this instance interesting means how different their spam probability is from 0.5. Every word is then iterated, if the word is in the interesting hash map it is retrieved, else the word is given a new spam probability of 0.4. If a word is more interesting then it is added to the list but the list is limited to only 15 most interesting words of each message. Then Baye’s rule is applied, by multiplying spam probabilities together for each word, then the following formula is applied; spam = spamProduct / (spamProduct + induvidualWordSpamProbability). Then if the calculated probability is higher than 0.9, then it is considered to be spam."
+splitUpMessages() - This method cleans up the testing.txt file to remove line breaks and stores each message in an array, they are then iterated through, each message is analysed to test if it is spam or not. Then the results are return to predictions.txt file.
+trainAll() - This method cleans up training.txt file by removing line breaks, then each message is stored in an array. Each message is then checked if it contains the word ham or spam, if it contains spam it is pasted to trainHam() else it is passed to trainSpam().
+trainSpam() - Read the string and break up into words, and checks if this spam word is already in the hash map, else it is added to the list.
+trainHam() - Read the string and break up into words, and checks if this ham word is already in the hash map, else it is added to the list.
+
+Challenges I faced
+
+The challenges I faced for this problem is that because the messages are of a very small length, it was hard to calculate the probability of spam and ham. There seems to be a problem due to the values chosen when calculating the probability. The results end up being really small, and because the numbered are very small, it becomes a nuisance and the end results are very wrong. This problem still persists, so the chances of the program calculating spam from ham is low unless the length of the messages are significantly longer.
+I have tried to fix this problem but have ran out of time and have had no luck. Another problem was that because the training data contained both spam and ham, I had to find a way remove the useless line breaks, in the end I used regex to split them up into an array and then checked if they contained the word ham or spam. This fix is very bad because if a ham message contains the word spam, the program will get very confused results and vice versa.
+
+As I already mentioned at the moment, the training works fine but analysing the testing data doesn’t work as intended. It calculates all the messages to be ham, which is obviously incorrect. I tested it with data of significant message length and that seems to work fine.
